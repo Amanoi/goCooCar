@@ -42,6 +42,7 @@ Page({
         },
       })
     }
+    this.updateMotto()
   },
   getUserInfo(e: any) {
     console.log(e)
@@ -51,4 +52,24 @@ Page({
       hasUserInfo: true,
     })
   },
+
+  //闭包应用
+  updateMotto(){
+    let shouldStop = false
+    setTimeout(()=>{
+      shouldStop = true
+    },10000)
+    let count = 0
+    const update = ()=>{
+      count ++
+      if(!shouldStop){
+        this.setData({
+           motto:`Update count:${count}`
+        },()=>{
+          update()
+        })
+      }
+    }
+    update()
+  }
 })
