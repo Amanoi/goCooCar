@@ -4,14 +4,14 @@ const app = getApp<IAppOption>()
 
 Page({
   data: {
-    motto: 'Hello World',
+    motto: 'Hello TypeScript',
     userInfo: {},
     hasUserInfo: false,
     // canIUse: wx.canIUse('button.open-type.getUserInfo'),
   },
   // 事件处理函数
   bindViewTap() {
-    wx.navigateTo({
+    wx.redirectTo({
       url: '../logs/logs',
     })
   },
@@ -28,11 +28,8 @@ app.globalData.userInfo.then(
   },
   getUserInfo(e: any) {
     console.log(e)
-    app.globalData.userInfo = e.detail.userInfo
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true,
-    })
+    const userInfo:WechatMiniprogram.UserInfo = e.detail.userInfo
+    app.resoveUserInfo(userInfo)
   },
 
   //闭包应用
