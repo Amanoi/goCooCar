@@ -15,15 +15,12 @@ Page({
       url: '../logs/logs',
     })
   },
-  onLoad() {
-app.globalData.userInfo.then(
-      userInfo=>{
-        this.setData({
-          userInfo:userInfo,
-          hasUserInfo: true,
-        })
-      }
-    )
+  async onLoad() {
+    const userInfo = await app.globalData.userInfo
+    this.setData({
+      userInfo:userInfo,
+      hasUserInfo: true,
+    })
     //this.updateMotto()
   },
   getUserInfo(e: any) {
