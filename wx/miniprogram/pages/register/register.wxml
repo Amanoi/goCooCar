@@ -1,1 +1,41 @@
-<view class="container"></view>>
+<view class="container padding-top-xl">
+    <view class="lic-tmpl" wx:if="{{!licImgURL}}" bindtap="onUploadLic">
+        <image class="lic-tmpl-img" src="/resources/lic.png" />
+        <view class="cuIcon-camerafill ls text-gray"></view>
+        <view class="instruction">请上传驾驶证照片</view>
+    </view>
+    <block wx:else>
+    <view class="lic-tmpl">
+        <image class="lic-verif-img" src="{{licImgURL}}" />
+        <image wx:if="{{state==='VERIFIED'}}" class="lic-check" src="/resources/check.png"/>
+    </view>
+    <view class="lic-form margin-top-xl">
+        <view class="cu-form-group margin-top">
+            <view class="title">驾驶证号</view>
+            <input placeholder="驾驶证号" value="{{licNo}}" disabled="{{state!=='UNSUBMITTED'}}"></input>
+        </view>
+        <view class="cu-form-group">
+            <view class="title">姓名</view>
+            <input placeholder="姓名" value="{{name}}" disabled="{{state!=='UNSUBMITTED'}}"></input>
+        </view>
+        <view class="cu-form-group">
+            <view class="title">性别</view>
+            <picker bindchange="onGenderChange" value="{{genderIndex}}" range="{{genders}}" disabled="{{state!=='UNSUBMITTED'}}"> 
+                <view class="picker">{{genders[genderIndex]}}</view>
+            </picker>
+        </view>
+    
+        <view class="cu-form-group">
+            <view class="title">出生日期</view>
+            <picker  bindchange="onBirthDateChange" mode="date" value="{{birthDate}}" disabled="{{state!=='UNSUBMITTED'}}">
+                <view class="picker">
+                    {{birthDate}}
+                </view>
+            </picker>
+        </view>
+    </view>
+    <button wx:if="{{state==='UNSUBMITTED'}}" bindtap="onSubmit" class="cu-btn bg-red lg margin-top-xl margin-bottom-xl">递交审查</button>
+    <button wx:if="{{state==='PENDING'}}" class="cu-btn block bg-blue lg margin-top-xl margin-bottom-xl" disabled>审查中</button>
+    <button wx:if="{{state==='VERIFIED'}}" bindtap="onResubmit" class="cu-btn bg-red lg margin-top-xl margin-bottom-xl">重新审查</button>
+    </block>
+</view>
