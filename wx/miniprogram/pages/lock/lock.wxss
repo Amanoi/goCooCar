@@ -1,0 +1,33 @@
+/* miniprogram/pages/lock/lock.wxss */
+page{
+    width: 100%;
+    height: 100%;
+}
+.container{
+    width: 100%;
+    height: 100%;
+    padding: 5% 0;
+}
+.sedan-img {
+    width: 700rpx;
+    height: 420rpx;
+}
+.avatar-container{
+    width: 100%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+.avatar-switch-container{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 8em;
+}
+.unshare-avatar{
+    opacity: .5;
+}
+.unlock-btn {
+    bottom: 100rpx;
+    width: 650rpx !important;
+}

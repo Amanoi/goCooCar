@@ -43,7 +43,8 @@ Page({
         width: 50,
         height: 50,
       },
-    ]
+    ],
+    avatarURL:'',
   },
   onMyLocationTap() {
     wx.getLocation({
@@ -69,6 +70,12 @@ Page({
   },
   onShow(){
     this.isPageShowing = true
+  },
+  async onLoad() {
+    const userInfo = await getApp<IAppOption>().globalData.userInfo
+    this.setData({
+        avatarURL: userInfo.avatarUrl,
+    })
   },
   onHide(){
     this.isPageShowing = false

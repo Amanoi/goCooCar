@@ -1,6 +1,7 @@
 <map id="map" latitude="{{location.latitude}}" longitude="{{location.longitude}}" scale="{{scale}}" settng="{{setting}}" enable-overlooking="{{isOverLooking}}" enable-3D="{{is3D}}" markers="{{markers}}">
   <cover-view class="icon-container">
-    <cover-image src="/resources/account.png"></cover-image>
+    <cover-image wx:if="{{!avatarURL}}" src="/resources/account.png"></cover-image>
+     <cover-image wx:if="{{avatarURL}}" src="{{avatarURL}}" class="round"></cover-image>
     <cover-image bindtap="onMyLocationTap" src="/resources/my_location.png"></cover-image>
   </cover-view>
 </map>
