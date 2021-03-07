@@ -1,0 +1,14 @@
+<!-- miniprogram/pages/driving/driving.wxml -->
+<view class="container">
+    <view class="driving-container bg-white">
+        <view class="payment">
+            <view class="driving-time">
+                <text class="cuIcon-timefill"></text>
+                <text>{{elapsed}}</text>
+            </view>
+            <view class="driving-cost margin-top-sm">费用:{{fee}}元</view>
+        </view>
+        <button class="cu-btn bg-red lg  driving-stop-btn" role="button">结束行程</button>
+    </view>
+    <map id="map" show-location="{{setting.showLocation}}" show-compass="{{setting.showCompass}}" show-scale scale="{{scale}}" latitude="{{location.latitude}}" longitude="{{location.longitude}}"></map>
+</view>

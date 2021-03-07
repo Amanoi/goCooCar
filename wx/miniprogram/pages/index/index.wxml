@@ -1,13 +1,10 @@
-<!--index.wxml-->
-<view class="container">
-  <view class="userinfo">
-    <button wx:if="{{!hasUserInfo}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-    <block wx:else>
-      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block>
-  </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
-  </view>
+<map id="map" latitude="{{location.latitude}}" longitude="{{location.longitude}}" scale="{{scale}}" settng="{{setting}}" enable-overlooking="{{isOverLooking}}" enable-3D="{{is3D}}" markers="{{markers}}">
+  <cover-view class="icon-container">
+    <cover-image wx:if="{{!avatarURL}}" src="/resources/account.png"></cover-image>
+     <cover-image wx:if="{{avatarURL}}" src="{{avatarURL}}" class="round"></cover-image>
+    <cover-image bindtap="onMyLocationTap" src="/resources/my_location.png"></cover-image>
+  </cover-view>
+</map>
+<view class="btn-container bg-grey round" bindtap="onScanClicked">
+  <view>扫码租车</view>
 </view>

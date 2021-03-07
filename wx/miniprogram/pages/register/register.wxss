@@ -1,0 +1,49 @@
+/* miniprogram/pages/register/register.wxss */
+
+.lic-tmpl {
+    width: 600rpx;
+    height: 450rpx;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.lic-tmpl-img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    opacity: .2;
+}
+
+.lic-verif-img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.instruction {
+    position: absolute;
+    bottom: -74rpx;
+}
+
+.cuIcon-camerafill {
+    font-size: 172rpx;
+}
+
+.cu-form-group .title {
+    min-width: calc(4em + 30rpx);
+}
+
+.lic-form {
+    width: 700rpx;
+}
+
+.lic-check {
+    position: absolute;
+    width: 15%;
+    height: 15%;
+    top: 1%;
+    right: 1%;
+    opacity: .3;
+}
