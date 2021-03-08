@@ -1,3 +1,5 @@
+import { routing } from "../../utils/routing"
+
 Page({
     data:{
         avatarURL:'',
@@ -17,7 +19,7 @@ Page({
     },
     onRegisterTap(){
         wx.navigateTo({
-            url:"/pages/register/register",
+            url:routing.register(),
         })
     },
 })

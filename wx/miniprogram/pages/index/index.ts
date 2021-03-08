@@ -1,6 +1,6 @@
 // index.ts
-// 获取应用实例
-const app = getApp<IAppOption>()
+
+import { routing } from "../../utils/routing"
 
 Page({
   isPageShowing: false,
@@ -114,9 +114,14 @@ Page({
       success: () => {
         // TODO: get carID from scan result
         const carID = 'car123'
-        const redirectURL = `/pages/lock/lock?car_id=${carID}`
+        const redirectURL = routing.lock({
+          car_id:carID,
+        })
         wx.navigateTo({
-          url: `/pages/register/register?redirect=${encodeURIComponent(redirectURL)}`,
+          // url: `/pages/register/register?redirect=${encodeURIComponent(redirectURL)}`,
+          url:routing.register({
+            redirectURL:redirectURL,
+          })
         })
       },
       fail: console.error,
@@ -124,7 +129,7 @@ Page({
   },
   onMyTripsTap() {
     wx.navigateTo({
-      url: "/pages/mytrips/mytrips",
+      url: routing.mytrips(),
     })
   }
 })

@@ -1,11 +1,14 @@
+import { routing } from "../../utils/routing"
+
 const shareLocationkey = "share_location"
 Page({
     data: {
         avatarURL: '',
         shareLocation: false,
     },
-    async onLoad(opt) {
-        console.log('unlocking cat',opt.car_id)
+    async onLoad(opt:Record<'car_id',string>) {
+        const o:routing.LocksOpts = opt
+        console.log('unlocking cat',o.car_id)
         const userInfo = await getApp<IAppOption>().globalData.userInfo
         this.setData({
             avatarURL: userInfo.avatarUrl,
@@ -43,7 +46,9 @@ Page({
                 })
                 setTimeout(() => {
                     wx.redirectTo({
-                        url: `/pages/driving/driving?trip_id=${tripID}`,
+                        url:routing.driving({
+                            trip_id:tripID,
+                        }),
                         complete: () => {
                             wx.hideLoading()
                         },

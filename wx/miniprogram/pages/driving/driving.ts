@@ -1,3 +1,5 @@
+import { routing } from "../../utils/routing"
+
 const cenPerSec = 0.7
 
 function formatDuration(sec:number){
@@ -40,8 +42,9 @@ Page({
         },
         scale:16,
     },
-    onLoad(opt) {
-        console.log('current trip_id',opt.trip_id)
+    onLoad(opt:Record<'trip_id',string>) {
+        const o:routing.DrivingOpts = opt
+        console.log('current trip_id',o.trip_id)
         this.setupLocationUpdator()
         this.setUpTimer()
     },

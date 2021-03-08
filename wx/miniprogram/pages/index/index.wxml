@@ -1,4 +1,4 @@
-<map id="map" latitude="{{location.latitude}}" longitude="{{location.longitude}}" scale="{{scale}}" settng="{{setting}}" enable-overlooking="{{isOverLooking}}" enable-3D="{{is3D}}" markers="{{markers}}">
+<map id="map" show-location latitude="{{location.latitude}}" longitude="{{location.longitude}}" scale="{{scale}}" enable-overlooking="{{isOverLooking}}" enable-3D="{{is3D}}" markers="{{markers}}">
   <cover-view class="icon-container">
     <!-- <cover-image wx:if="{{avatarURL}}" src="/resources/account.png" bindtap="onMyTrips"></cover-image> -->
     <cover-image src="{{avatarURL || '/resources/account.png'}}" class="round" bindtap="onMyTripsTap"></cover-image>
