@@ -40,7 +40,8 @@ Page({
         },
         scale:16,
     },
-    onLoad() {
+    onLoad(opt) {
+        console.log('current trip_id',opt.trip_id)
         this.setupLocationUpdator()
         this.setUpTimer()
     },

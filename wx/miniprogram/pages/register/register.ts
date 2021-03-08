@@ -1,12 +1,13 @@
 Page({
+    redirectURL:'',
     data: {
-        licNo:'',
-        name:'',
-        genderIndex:0,
-        genders:['未知','男','女','其他'],
+        licNo: '',
+        name: '',
+        genderIndex: 0,
+        genders: ['未知', '男', '女', '其他'],
         licImgURL: '',
-        birthDate:'1990-09-11',
-        state:'UNSUBMITTED' as 'UNSUBMITTED'|'PENDING'|'VERIFIED',
+        birthDate: '1990-09-11',
+        state: 'UNSUBMITTED' as 'UNSUBMITTED' | 'PENDING' | 'VERIFIED',
     },
     onUploadLic() {
         wx.chooseImage({
@@ -16,51 +17,59 @@ Page({
                         licImgURL: res.tempFilePaths[0]
                     })
                     //TODO: upload image
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         this.setData({
-                            liNo:'52323123',
-                            name:'Daneil',
-                            genderIndex:1,
-                            birthDate:'1989-09-07',
+                            liNo: '52323123',
+                            name: 'Daneil',
+                            genderIndex: 1,
+                            birthDate: '1989-09-07',
                         })
-                    },1000)
+                    }, 1000)
 
                 }
             }
 
         })
     },
-    onGenderChange(e:any){
+    onLoad(opt) {
+        if( opt.redirect){
+            this.redirectURL = decodeURIComponent(opt.redirect)
+        }   
+    },
+    onGenderChange(e: any) {
         this.setData({
-            genderIndex:e.detail.value,
+            genderIndex: e.detail.value,
         })
     },
-    onBirthDateChange(e:any){
+    onBirthDateChange(e: any) {
         this.setData({
-            birthDate:e.detail.value
+            birthDate: e.detail.value
         })
     },
-    onSubmit(){
+    onSubmit() {
         //TODO: submit the form to server
         this.setData({
-            state:'PENDING',
+            state: 'PENDING',
         })
-        setTimeout(()=>{
+        setTimeout(() => {
             this.onLicVerified()
-        },3000)
+        }, 3000)
     },
-    onResubmit(){
+    onResubmit() {
         this.setData({
-            state:'UNSUBMITTED',
-            licImgURL:'',
+            state: 'UNSUBMITTED',
+            licImgURL: '',
         })
     },
-    onLicVerified(){
+    onLicVerified() {
         this.setData({
-            state:'VERIFIED',
+            state: 'VERIFIED',
         })
-        wx.navigateTo({
-            url:'/pages/lock/lock'
-        })
+        if (this.redirectURL) {
+            wx.redirectTo({
+                url: this.redirectURL
+            })
+        }
+        
     },
 })

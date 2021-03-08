@@ -1,0 +1,7 @@
+<swiper ></swiper>
+<view class="avatar-container">
+    <view class="avatar">
+
+    </view>
+    <view bindtap="onRegisterTap" class="text-blue">驾驶资格未认证</view>
+</view>

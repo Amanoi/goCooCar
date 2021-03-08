@@ -4,7 +4,8 @@ Page({
         avatarURL: '',
         shareLocation: false,
     },
-    async onLoad() {
+    async onLoad(opt) {
+        console.log('unlocking cat',opt.car_id)
         const userInfo = await getApp<IAppOption>().globalData.userInfo
         this.setData({
             avatarURL: userInfo.avatarUrl,
@@ -34,13 +35,15 @@ Page({
                     //TODO:双向数据绑定
                     avatarURL: this.data.shareLocation ? this.data.avatarURL : '',
                 })
+                const tripID = 'trip456'
+
                 wx.showLoading({
                     title: '解锁中',
                     mask: true,
                 })
                 setTimeout(() => {
                     wx.redirectTo({
-                        url: '/pages/driving/driving',
+                        url: `/pages/driving/driving?trip_id=${tripID}`,
                         complete: () => {
                             wx.hideLoading()
                         },
