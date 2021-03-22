@@ -1,10 +1,15 @@
+import {IAppOption} from "../../appoption"
+import { routing } from "../../utils/routing"
+
 const shareLocationkey = "share_location"
 Page({
     data: {
         avatarURL: '',
         shareLocation: false,
     },
-    async onLoad() {
+    async onLoad(opt:Record<'car_id',string>) {
+        const o:routing.LocksOpts = opt
+        console.log('unlocking cat',o.car_id)
         const userInfo = await getApp<IAppOption>().globalData.userInfo
         this.setData({
             avatarURL: userInfo.avatarUrl,
@@ -34,13 +39,17 @@ Page({
                     //TODO:双向数据绑定
                     avatarURL: this.data.shareLocation ? this.data.avatarURL : '',
                 })
+                const tripID = 'trip456'
+
                 wx.showLoading({
                     title: '解锁中',
                     mask: true,
                 })
                 setTimeout(() => {
                     wx.redirectTo({
-                        url: '/pages/driving/driving',
+                        url:routing.driving({
+                            trip_id:tripID,
+                        }),
                         complete: () => {
                             wx.hideLoading()
                         },

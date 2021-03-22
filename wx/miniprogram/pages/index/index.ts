@@ -1,9 +1,9 @@
 // index.ts
-// 获取应用实例
-const app = getApp<IAppOption>()
+import {IAppOption} from "../../appoption"
+import { routing } from "../../utils/routing"
 
 Page({
-  isPageShowing:false,
+  isPageShowing: false,
   data: {
     // 默认值
     setting: {
@@ -44,7 +44,7 @@ Page({
         height: 50,
       },
     ],
-    avatarURL:'',
+    avatarURL: '',
   },
   onMyLocationTap() {
     wx.getLocation({
@@ -56,7 +56,7 @@ Page({
             latitude: res.latitude,
             longitude: res.longitude,
           },
-          scale:20,
+          scale: 20,
         })
       },
       fail: (res) => {
@@ -68,40 +68,40 @@ Page({
       }
     })
   },
-  onShow(){
+  onShow() {
     this.isPageShowing = true
   },
   async onLoad() {
     const userInfo = await getApp<IAppOption>().globalData.userInfo
     this.setData({
-        avatarURL: userInfo.avatarUrl,
+      avatarURL: userInfo.avatarUrl,
     })
   },
-  onHide(){
+  onHide() {
     this.isPageShowing = false
   },
-  moveCars(){
+  moveCars() {
     const map = wx.createMapContext('map')
     const dest = {
-      latitude:this.data.markers[0].latitude,
-      longitude:this.data.markers[0].longitude,
+      latitude: this.data.markers[0].latitude,
+      longitude: this.data.markers[0].longitude,
     }
 
-    const moveCar= ()=>{
+    const moveCar = () => {
       dest.latitude += 0.01
       dest.longitude += 0.01
       console.log(this.data.markers[0].latitude)
       map.translateMarker({
-        destination:{
-          latitude:dest.latitude,
-          longitude:dest.longitude,
+        destination: {
+          latitude: dest.latitude,
+          longitude: dest.longitude,
         },
-        markerId:0,
-        autoRotate:false,
-        rotate:0,
-        duration:5000,
-        animationEnd:()=>{
-          if(this.isPageShowing){
+        markerId: 0,
+        autoRotate: false,
+        rotate: 0,
+        duration: 5000,
+        animationEnd: () => {
+          if (this.isPageShowing) {
             moveCar()
           }
         },
@@ -109,14 +109,27 @@ Page({
     }
     moveCar();
   },
-  onScanClicked(){
+  onScanTap() {
     wx.scanCode({
-      success:()=>{
+      success: () => {
+        // TODO: get carID from scan result
+        const carID = 'car123'
+        const redirectURL = routing.lock({
+          car_id:carID,
+        })
         wx.navigateTo({
-          url:'/pages/register/register',
+          // url: `/pages/register/register?redirect=${encodeURIComponent(redirectURL)}`,
+          url:routing.register({
+            redirectURL:redirectURL,
+          })
         })
       },
-      fail:console.error,
+      fail: console.error,
+    })
+  },
+  onMyTripsTap() {
+    wx.navigateTo({
+      url: routing.mytrips(),
     })
   }
 })

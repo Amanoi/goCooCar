@@ -14,6 +14,10 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 .vscode
+server/__debug_bin
 wx/miniprogram/**/*.js
+!**/wx/miniprogram/service/proto_gen/*.js
 node_modules
 *.lock
+*lock.json
+miniprogram_npm
