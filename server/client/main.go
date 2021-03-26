@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	trippb "server/proto/gen/go"
+	trippb "coolcar/proto/gen/go"
 
 	"google.golang.org/grpc"
 )
