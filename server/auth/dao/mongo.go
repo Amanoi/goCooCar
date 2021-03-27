@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"coolcar/share/mongo/mgo"
+
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+const opedIDField = "open_id"
 
 // Mongo defines a mongo dao.
 type Mongo struct {
@@ -25,21 +28,17 @@ func NewMongo(db *mongo.Database) *Mongo {
 // ResolveAccountID reslove an account id from open id.
 func (m *Mongo) ResolveAccountID(c context.Context, openID string) (string, error) {
 	res := m.col.FindOneAndUpdate(c, bson.M{
-		"open_id": openID,
-	}, bson.M{
-		"$set": bson.M{
-			"open_id": openID,
-		},
-	}, options.
+		opedIDField: openID,
+	}, mgo.Set(bson.M{
+		opedIDField: openID,
+	}), options.
 		FindOneAndUpdate().
 		SetUpsert(true).
 		SetReturnDocument(options.After))
 	if err := res.Err(); err != nil {
 		return "", fmt.Errorf("cannot findOneAndUpdate: %v", err)
 	}
-	var row struct {
-		ID primitive.ObjectID `bson:"_id"`
-	}
+	var row = mgo.ObjID
 	err := res.Decode(&row)
 	if err != nil {
 		return "", fmt.Errorf("cannot decode result:%v", err)
