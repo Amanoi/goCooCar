@@ -39,7 +39,7 @@ func TestResolveAccountID(t *testing.T) {
 	m.newObjID = func() primitive.ObjectID {
 		return mustObjID("605d838cbcfcb14576c15cb4")
 	}
-
+	
 	cases := []struct {
 		name   string
 		openID string

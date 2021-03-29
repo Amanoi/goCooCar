@@ -21,3 +21,4 @@ node_modules
 *.lock
 *lock.json
 miniprogram_npm
+private.key
