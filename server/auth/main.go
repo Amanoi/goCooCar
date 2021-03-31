@@ -7,9 +7,9 @@ import (
 	"coolcar/auth/auth/wechat"
 	"coolcar/auth/dao"
 	"coolcar/auth/token"
+	"coolcar/shared/server"
 	"io/ioutil"
 	"log"
-	"net"
 	"os"
 	"time"
 
@@ -64,15 +64,11 @@ import (
 // }
 
 func main() {
-	logger, err := newZaplogger()
+	logger, err := server.NewZaplogger()
 	if err != nil {
 		log.Fatalf("cannot create logger :%v", err)
 	}
-	lis, err := net.Listen("tcp", ":8081")
-	if err != nil {
-		logger.Fatal("cannot listen", zap.Error(err))
-	}
-	defer lis.Close()
+
 	c := context.Background()
 	mongoClient, err := mongo.Connect(c, options.Client().ApplyURI("mongodb://localhost:55000/?readPreference=primary&ssl=false"))
 	if err != nil {
@@ -90,31 +86,28 @@ func main() {
 		logger.Fatal("cannot read private key", zap.Error(err))
 	}
 
-	privKey,err:= jwt.ParseRSAPrivateKeyFromPEM(pkBytes)
+	privKey, err := jwt.ParseRSAPrivateKeyFromPEM(pkBytes)
 
-	if err != nil{
-		logger.Fatal("cannot parse private key",zap.Error(err))
-	}
-
-	s := grpc.NewServer()
-	authpb.RegisterAuthServiceServer(s, &auth.Service{
-		OpenIDResolver: &wechat.Service{
-			AppID:     "wx0f0f861580b7e1d1",
-			AppSecret: "0cc481da864bfeab26182d0bf82b12c5",
-		},
-		Mongo:          dao.NewMongo(mongoClient.Database("coolcar")),
-		Logger:         logger,
-		TokenExpire:    2 * time.Hour,
-		TokenGenerator: token.NewJWTTokenGen("coolcar/auth",privKey),
-	})
-	err = s.Serve(lis)
 	if err != nil {
-		logger.Fatal("Cannot server", zap.Error(err))
+		logger.Fatal("cannot parse private key", zap.Error(err))
 	}
-}
-
-func newZaplogger() (*zap.Logger, error) {
-	cfg := zap.NewDevelopmentConfig()
-	cfg.EncoderConfig.TimeKey = ""
-	return cfg.Build()
+	logger.Sugar().Fatal(server.RunGRPCServer(
+		&server.GRPCConfig{
+			Name:   "auth",
+			Addr:   ":8081",
+			Logger: logger,
+			RegisterFunc: func(s *grpc.Server) {
+				authpb.RegisterAuthServiceServer(s, &auth.Service{
+					OpenIDResolver: &wechat.Service{
+						AppID:     "wx0f0f861580b7e1d1",
+						AppSecret: "0cc481da864bfeab26182d0bf82b12c5",
+					},
+					Mongo:          dao.NewMongo(mongoClient.Database("coolcar")),
+					Logger:         logger,
+					TokenExpire:    2 * time.Hour,
+					TokenGenerator: token.NewJWTTokenGen("coolcar/auth", privKey),
+				})
+			},
+		}),
+	)
 }

@@ -1,5 +1,12 @@
 package main
 
+import (
+	"coolcar/shared/server"
+	"log"
+
+	"go.uber.org/zap"
+)
+
 // import (
 // 	"encoding/json"
 // 	"fmt"
@@ -51,3 +58,17 @@ package main
 // 	proto.Unmarshal(b, &trip2)
 // 	fmt.Println(&trip2)
 // }
+
+func main() {
+	logger, err := server.NewZaplogger()
+	if err != nil {
+		panic(err)
+	}
+	logger.Sugar().Info("the test logger.sugar ", zap.String("name", "value"))
+	logger, err = zap.NewProduction()
+	if err != nil {
+		log.Fatalf("can't initialize zap logger: %v", err)
+	}
+	defer logger.Sync()
+	logger.Info("the test logger.sugar ", zap.String("name", "value"))
+}

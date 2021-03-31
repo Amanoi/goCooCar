@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	mgo "coolcar/share/mongo"
+	mgo "coolcar/shared/mongo"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

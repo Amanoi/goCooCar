@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	mgo "coolcar/share/mongo"
-	mongotesting "coolcar/share/mongo/testing"
+	mgo "coolcar/shared/mongo"
+	mongotesting "coolcar/shared/mongo/testing"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -39,7 +39,7 @@ func TestResolveAccountID(t *testing.T) {
 	m.newObjID = func() primitive.ObjectID {
 		return mustObjID("605d838cbcfcb14576c15cb4")
 	}
-	
+
 	cases := []struct {
 		name   string
 		openID string

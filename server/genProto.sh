@@ -16,37 +16,44 @@ LPURPLE=$(echo  '\033[01;35m')
 LCYAN=$(echo '\033[01;36m')
 WHITE=$(echo  '\033[01;37m')
 END=$(echo '\033[0m')
- 
- 
- 
- 
 
-#def PATH
-PROTO_PATH=./auth/api
-GO_OUT_PATH=./auth/api/gen/v1
-# make PATH
-echo $LGREEN"-> 创建PATH路径"$END $LCYAN$PROTO_PATH$END
-mkdir -p $PROTO_PATH
-echo $LGREEN"-> 创建PATH路径"$END $LCYAN$GO_OUT_PATH$END
-mkdir -p $GO_OUT_PATH
+function genProto {
+    
+    DOMAIN=$1
+    DOINGCOLOR=$LMAGENTA
+    DONECOLOR=$LGREEN
 
-# go
-echo $LGREEN"-> 生成auth.pb.go"$END 
-protoc -I=$PROTO_PATH --go_out=plugins=grpc,paths=source_relative:$GO_OUT_PATH $PROTO_PATH/auth.proto
-echo $LGREEN"-> 生成auth.pb.gw.go"$END
-protoc -I=$PROTO_PATH --grpc-gateway_out=paths=source_relative,grpc_api_configuration=$PROTO_PATH/auth.yaml:$GO_OUT_PATH $PROTO_PATH/auth.proto
+    #def PATH
+    PROTO_PATH=./${DOMAIN}/api
+    GO_OUT_PATH=./${DOMAIN}/api/gen/v1
+    # make PATH
+    echo $DOINGCOLOR"-> 创建PATH路径"$END $LCYAN$PROTO_PATH$END
+    mkdir -p $PROTO_PATH
+    echo $DOINGCOLOR"-> 创建PATH路径"$END $LCYAN$GO_OUT_PATH$END
+    mkdir -p $GO_OUT_PATH
+    
+    # go
+    echo $DOINGCOLOR"-> 生成${DOMAIN}.pb.go"$END
+    protoc -I=$PROTO_PATH --go_out=plugins=grpc,paths=source_relative:$GO_OUT_PATH $PROTO_PATH/${DOMAIN}.proto
+    echo $DOINGCOLOR"-> 生成${DOMAIN}.pb.gw.go"$END
+    protoc -I=$PROTO_PATH --grpc-gateway_out=paths=source_relative,grpc_api_configuration=$PROTO_PATH/${DOMAIN}.yaml:$GO_OUT_PATH $PROTO_PATH/${DOMAIN}.proto
+    
+    #js
+    PBTS_BIN_DIR=../wx/miniprogram/node_modules/.bin
+    PBTS_OUT_DIR=../wx/miniprogram/service/proto_gen/${DOMAIN}
+    echo $DOINGCOLOR"-> 创建JS 输出PATH路径"$END $LCYAN$PBTS_OUT_DIR$END
+    mkdir -p $PBTS_OUT_DIR
+    
+    echo $DOINGCOLOR"-> 生成${DOMAIN}_pb.js"$END
+    $PBTS_BIN_DIR/pbjs -t static -w es6 $PROTO_PATH/${DOMAIN}.proto --nocreate --no-encode --no-dencode --no-verify --no-delimited -o $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js
+    echo 'import * as $protobuf from "protobufjs";\n' > $PBTS_OUT_DIR/${DOMAIN}_pb.js
+    cat $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js >> $PBTS_OUT_DIR/${DOMAIN}_pb.js
+    rm $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js
+    echo $DOINGCOLOR"-> 生成${DOMAIN}_pb.d.ts"$END
+    $PBTS_BIN_DIR/pbts -o $PBTS_OUT_DIR/${DOMAIN}_pb.d.ts $PBTS_OUT_DIR/${DOMAIN}_pb.js
+    echo $DONECOLOR"->" ${DOMAIN}" 完成"$END
+}
 
-#js
-PBTS_BIN_DIR=../wx/miniprogram/node_modules/.bin
-PBTS_OUT_DIR=../wx/miniprogram/service/proto_gen/auth
-echo $LGREEN"-> 创建JS 输出PATH路径"$END $LCYAN$PBTS_OUT_DIR$END
-mkdir -p $PBTS_OUT_DIR
+genProto auth
+genProto rental
 
-echo $LGREEN"-> 生成auth_pb.js"$END
-$PBTS_BIN_DIR/pbjs -t static -w es6 $PROTO_PATH/auth.proto --nocreate --no-encode --no-dencode --no-verify --no-delimited -o $PBTS_OUT_DIR/auth_pb_tmp.js
-echo 'import * as $protobuf from "protobufjs";\n' > $PBTS_OUT_DIR/auth_pb.js
-cat $PBTS_OUT_DIR/auth_pb_tmp.js >> $PBTS_OUT_DIR/auth_pb.js
-rm $PBTS_OUT_DIR/auth_pb_tmp.js
-echo $LGREEN"-> 生成auth_pb.d.ts"$END
-$PBTS_BIN_DIR/pbts -o $PBTS_OUT_DIR/auth_pb.d.ts $PBTS_OUT_DIR/auth_pb.js
-echo $LGREEN"-> 完成"$END

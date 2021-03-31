@@ -51,7 +51,7 @@ func (s *Service) Login(c context.Context, req *authpb.LoginResquest) (*authpb.L
 	}
 
 	return &authpb.LoginResponse{
-		AccessToken: tkn + ":" + accountID,
+		AccessToken: tkn,
 		ExpiresIn:   int32(s.TokenExpire.Seconds()),
 	}, nil
 }
