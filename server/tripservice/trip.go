@@ -2,7 +2,7 @@ package trip
 
 import (
 	"context"
-	trippb "server/proto/gen/go"
+	trippb "coolcar/proto/gen/go"
 )
 
 //Service is implements trip service
@@ -38,5 +38,5 @@ func (*Service) GetTrip(c context.Context, req *trippb.GetTripRequest) (*trippb.
 			},
 			Status: trippb.TripStatus_IN_PROGRESS,
 		},
-	},nil
+	}, nil
 }
