@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	mgo "coolcar/shared/mongo"
+	mgutil "coolcar/shared/mongo"
 	mongotesting "coolcar/shared/mongo/testing"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,18 +25,18 @@ func TestResolveAccountID(t *testing.T) {
 	m := NewMongo(mc.Database("coolcar"))
 	_, err = m.col.InsertMany(c, []interface{}{
 		bson.M{
-			mgo.IDField: mustObjID("605d838cbcfcb14576815cbc"),
-			opedIDField: "openid_1",
+			mgutil.IDFieldName: mustObjID("605d838cbcfcb14576815cbc"),
+			opedIDField:        "openid_1",
 		},
 		bson.M{
-			mgo.IDField: mustObjID("605d838cbcfcb14576915cbe"),
-			opedIDField: "openid_2",
+			mgutil.IDFieldName: mustObjID("605d838cbcfcb14576915cbe"),
+			opedIDField:        "openid_2",
 		},
 	})
 	if err != nil {
 		t.Fatalf("cannot insert inital values: %v", err)
 	}
-	m.newObjID = func() primitive.ObjectID {
+	mgutil.NewObjID = func() primitive.ObjectID {
 		return mustObjID("605d838cbcfcb14576c15cb4")
 	}
 

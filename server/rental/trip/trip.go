@@ -17,11 +17,26 @@ type Service struct {
 }
 
 // CreateTrip creates a trip.
-func (s *Service) CreateTrip(c context.Context, req *rentalpb.CreateTripRequest) (*rentalpb.CreateTripResponse, error) {
+func (s *Service) CreateTrip(c context.Context, req *rentalpb.CreateTripRequest) (*rentalpb.TripEntity, error) {
 	aid, err := auth.AccountIDFromContext(c)
 	if err != nil {
 		return nil, err
 	}
-	s.Logger.Info("create trip", zap.String("Start", req.Start), zap.String("account_id", aid.String()))
+	s.Logger.Info("create trip", zap.String("Start", req.Start.String()), zap.String("account_id", aid.String()))
 	return nil, status.Error(codes.Unimplemented, "")
+}
+
+// GetTrip  get the trip data.
+func (s *Service) GetTrip(c context.Context, t *rentalpb.GetTripRequest) (*rentalpb.Trip, error) {
+	return nil, nil
+}
+
+// GetTrips  get the trips data.
+func (s *Service) GetTrips(c context.Context, in *rentalpb.GetTripsRequest) (*rentalpb.GetTripsResponse, error) {
+	return nil, nil
+}
+
+// UpdateTrip  udate the trip data.
+func (s *Service) UpdateTrip(c context.Context, in *rentalpb.UpdateTripRequest) (*rentalpb.Trip, error) {
+	return nil, nil
 }
