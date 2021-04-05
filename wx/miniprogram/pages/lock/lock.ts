@@ -43,7 +43,7 @@ Page({
                 TripService.CreateTrip({
                     start:'abc'
                 })
-                return
+               
                 const tripID = 'trip456'
 
                 wx.showLoading({
