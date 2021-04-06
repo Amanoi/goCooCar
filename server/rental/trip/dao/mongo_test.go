@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	rentalpb "coolcar/rental/api/gen/v1"
+	"coolcar/shared/id"
+	"coolcar/shared/mongo/objid"
 	mongotesting "coolcar/shared/mongo/testing"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,8 +24,9 @@ func TestCreateTrip(t *testing.T) {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
 	m := NewMongo(mc.Database("coolcar"))
+	acct := id.AccountID("account1")
 	tr, err := m.CreateTrip(c, &rentalpb.Trip{
-		AccountId: "account1",
+		AccountId: acct.String(),
 		CarId:     "car1",
 		Start: &rentalpb.LocationStatus{
 			PoiName: "start",
@@ -47,7 +50,7 @@ func TestCreateTrip(t *testing.T) {
 		t.Errorf("cannot create trip: %v", err)
 	}
 	t.Errorf("%+v", tr)
-	got, err := m.GetTrip(c, tr.ID.Hex(), "account1")
+	got, err := m.GetTrip(c, objid.ToTripID(tr.ID), acct)
 	if err != nil {
 		t.Errorf("cannot get trip: %v", err)
 	}

@@ -5,7 +5,9 @@ import (
 	"os"
 	"testing"
 
+	"coolcar/shared/id"
 	mgutil "coolcar/shared/mongo"
+	"coolcar/shared/mongo/objid"
 	mongotesting "coolcar/shared/mongo/testing"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,11 +27,11 @@ func TestResolveAccountID(t *testing.T) {
 	m := NewMongo(mc.Database("coolcar"))
 	_, err = m.col.InsertMany(c, []interface{}{
 		bson.M{
-			mgutil.IDFieldName: mustObjID("605d838cbcfcb14576815cbc"),
+			mgutil.IDFieldName: objid.MustFromID(id.AccountID("605d838cbcfcb14576815cbc")),
 			opedIDField:        "openid_1",
 		},
 		bson.M{
-			mgutil.IDFieldName: mustObjID("605d838cbcfcb14576915cbe"),
+			mgutil.IDFieldName: objid.MustFromID(id.AccountID("605d838cbcfcb14576915cbe")),
 			opedIDField:        "openid_2",
 		},
 	})
@@ -37,7 +39,7 @@ func TestResolveAccountID(t *testing.T) {
 		t.Fatalf("cannot insert inital values: %v", err)
 	}
 	mgutil.NewObjID = func() primitive.ObjectID {
-		return mustObjID("605d838cbcfcb14576c15cb4")
+		return objid.MustFromID(id.AccountID("605d838cbcfcb14576c15cb4"))
 	}
 
 	cases := []struct {
@@ -67,7 +69,7 @@ func TestResolveAccountID(t *testing.T) {
 			if err != nil {
 				t.Errorf("fail resolve account id for %q:%v\n", cc.openID, err)
 			}
-			if id != cc.want {
+			if id.String() != cc.want {
 				t.Errorf("resolve account id want: %q,got:%q", cc.want, id)
 			}
 		})
@@ -82,14 +84,6 @@ func TestResolveAccountID(t *testing.T) {
 	// 	}
 	// }
 }
-func mustObjID(hex string) primitive.ObjectID {
-	objID, err := primitive.ObjectIDFromHex(hex)
-	if err != nil {
-		panic(err)
-	}
-	return objID
-}
-
 func TestMain(m *testing.M) {
 	os.Exit(mongotesting.RunWithMongoInDocker(m, &mongoURI))
 }

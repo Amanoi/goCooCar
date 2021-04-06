@@ -44,7 +44,7 @@ func (s *Service) Login(c context.Context, req *authpb.LoginResquest) (*authpb.L
 	}
 	s.Logger.Info("received code", zap.String("code", req.Code))
 
-	tkn, err := s.TokenGenerator.GenerateToken(accountID, s.TokenExpire)
+	tkn, err := s.TokenGenerator.GenerateToken(accountID.String(), s.TokenExpire)
 	if err != nil {
 		s.Logger.Error("cannot generate token", zap.Error(err))
 		return nil, status.Error(codes.Internal, "")

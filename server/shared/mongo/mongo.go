@@ -24,7 +24,7 @@ type UpdatedAtField struct {
 }
 
 // NewObjID generates a new object id.
-var NewObjID = primitive.NewObjectID()
+var NewObjID = primitive.NewObjectID
 
 // UpdatedAt  returns a value suitable for UpdateAt field.
 var UpdatedAt = func() int64 {
