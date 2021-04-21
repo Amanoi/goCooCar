@@ -36,6 +36,10 @@ type TripRecord struct {
 	Trip                  *rentalpb.Trip `bson:"trip"`
 }
 
+// TODO: 强类型化 tripID
+// TODO: 同一个account 最多只有一个进行中的Trip
+// TODO: 表格驱动测试
+
 // CreateTrip creates a trip.
 func (m *Mongo) CreateTrip(c context.Context, trip *rentalpb.Trip) (*TripRecord, error) {
 	r := &TripRecord{

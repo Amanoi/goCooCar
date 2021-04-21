@@ -7,24 +7,101 @@ import (
 
 	rentalpb "coolcar/rental/api/gen/v1"
 	"coolcar/shared/id"
+	mgutil "coolcar/shared/mongo"
 	"coolcar/shared/mongo/objid"
 	mongotesting "coolcar/shared/mongo/testing"
 
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/google/go-cmp/cmp"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/protobuf/testing/protocmp"
 )
-
-var mongoURI string
 
 func TestCreateTrip(t *testing.T) {
 	c := context.Background()
-	mongoURI = "mongodb://localhost:55000"
-	mc, err := mongo.Connect(c, options.Client().ApplyURI(mongoURI))
+	mc, err := mongotesting.NewClient(c)
+	if err != nil {
+		t.Fatalf("cannot connect mongodb:%v", err)
+	}
+	db := mc.Database("coolcar")
+	err = mongotesting.SetupIndexes(c, db)
+	if err != nil {
+		t.Fatalf("cannot setup indexes: %v", err)
+	}
+	m := NewMongo(db)
+
+	cases := []struct {
+		name       string
+		tripID     string
+		accountID  string
+		tripStatus rentalpb.TripStatus
+		wantErr    bool
+	}{
+		{
+			name:       "finished",
+			tripID:     "607fcb673ec1f0074e5efc96",
+			accountID:  "account1",
+			tripStatus: rentalpb.TripStatus_FNISHED,
+		},
+		{
+			name:       "finished",
+			tripID:     "607fcb673ec1f0074e5efc97",
+			accountID:  "account1",
+			tripStatus: rentalpb.TripStatus_FNISHED,
+		},
+		{
+			name:       "in_progress",
+			tripID:     "607fcb673ec1f0074e5efc99",
+			accountID:  "account1",
+			tripStatus: rentalpb.TripStatus_IN_PROGRESS,
+		},
+		{
+			name:       "in_progress",
+			tripID:     "607fcb673ec1f0074e5efc00",
+			accountID:  "account1",
+			tripStatus: rentalpb.TripStatus_IN_PROGRESS,
+			wantErr:    true,
+		},
+		{
+			name:       "anther_in_progress",
+			tripID:     "607fcb673ec1f0074e5efd91",
+			accountID:  "account2",
+			tripStatus: rentalpb.TripStatus_IN_PROGRESS,
+		},
+	}
+	for _, cc := range cases {
+		mgutil.NewObjID = func() primitive.ObjectID {
+			return objid.MustFromID(id.TripID(cc.tripID))
+		}
+		tr, err := m.CreateTrip(c, &rentalpb.Trip{
+			AccountId: cc.accountID,
+			Status:    cc.tripStatus,
+		})
+		if cc.wantErr {
+			if err == nil {
+				t.Errorf("%s:error expected;got none", cc.name)
+			}
+			continue
+		}
+		if err != nil {
+			t.Errorf("%s:error creating trip: %v", cc.name, err)
+			continue
+		}
+		if tr.ID.Hex() != cc.tripID {
+			t.Errorf("%s:incorrect trip id; want:%q;got %q", cc.name, cc.tripID, tr.ID.Hex())
+		}
+	}
+
+}
+
+func TestGetTrip(t *testing.T) {
+	c := context.Background()
+	mc, err := mongotesting.NewClient(c)
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
 	m := NewMongo(mc.Database("coolcar"))
-	acct := id.AccountID("account1")
+	acct := id.AccountID("account2")
+	mgutil.NewObjID = primitive.NewObjectID
 	tr, err := m.CreateTrip(c, &rentalpb.Trip{
 		AccountId: acct.String(),
 		CarId:     "car1",
@@ -47,16 +124,17 @@ func TestCreateTrip(t *testing.T) {
 		Status: rentalpb.TripStatus_FNISHED,
 	})
 	if err != nil {
-		t.Errorf("cannot create trip: %v", err)
+		t.Fatalf("cannot create trip: %v", err)
 	}
-	t.Errorf("%+v", tr)
 	got, err := m.GetTrip(c, objid.ToTripID(tr.ID), acct)
 	if err != nil {
 		t.Errorf("cannot get trip: %v", err)
 	}
-	t.Errorf("got trip : %+v", got)
+	if diff := cmp.Diff(tr, got, protocmp.Transform()); diff != "" {
+		t.Errorf("result differs; -want +got: %s", diff)
+	}
 }
 
 func TestMain(m *testing.M) {
-	os.Exit(mongotesting.RunWithMongoInDocker(m, &mongoURI))
+	os.Exit(mongotesting.RunWithMongoInDocker(m))
 }
