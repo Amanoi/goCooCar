@@ -15,6 +15,7 @@ import (
 const (
 	tripField      = "trip"
 	accountIDField = tripField + ".accountid"
+	statusField    = tripField + ".status"
 )
 
 // Mongo defines a mongo dao.
@@ -73,4 +74,29 @@ func (m *Mongo) GetTrip(c context.Context, id id.TripID, accountID id.AccountID)
 		return nil, fmt.Errorf("cannot decode : %v", err)
 	}
 	return &tr, nil
+}
+
+// GetTrips gets trips for the account by status.
+// If status is not specified ,gets all trips for the account.
+func (m *Mongo) GetTrips(c context.Context, accountID id.AccountID, status rentalpb.TripStatus) ([]*TripRecord, error) {
+	filter := bson.M{
+		accountIDField: accountID.String(),
+	}
+	if status != rentalpb.TripStatus_TS_NOT_SPECIFIED {
+		filter[statusField] = status
+	}
+	res, err := m.col.Find(c, filter)
+	if err != nil {
+		return nil, err
+	}
+	var trips []*TripRecord
+	for res.Next(c) {
+		var trip TripRecord
+		err := res.Decode(&trip)
+		if err != nil {
+			return nil, err
+		}
+		trips = append(trips, &trip)
+	}
+	return trips, nil
 }
