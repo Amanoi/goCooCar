@@ -22,7 +22,7 @@ type IDField struct {
 
 // UpdatedAtField defines the updatedat field.
 type UpdatedAtField struct {
-	UpdatedAt int64 `bson:"updateat"`
+	UpdatedAt int64 `bson:"updatedat"`
 }
 
 // NewObjID generates a new object id.
