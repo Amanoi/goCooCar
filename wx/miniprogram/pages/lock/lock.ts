@@ -41,7 +41,7 @@ Page({
                     avatarURL: this.data.shareLocation ? this.data.avatarURL : '',
                 })
                 TripService.CreateTrip({
-                    start:'abc'
+                    
                 })
                
                 const tripID = 'trip456'

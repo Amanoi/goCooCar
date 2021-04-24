@@ -13,3 +13,17 @@ type TripID string
 func (t TripID) String() string {
 	return string(t)
 }
+
+// IdentityID defines Identity id object.
+type IdentityID string
+
+func (i IdentityID) String() string {
+	return string(i)
+}
+
+// CarID defines Car id object.
+type CarID string
+
+func (c CarID) String() string {
+	return string(c)
+}
