@@ -27,7 +27,7 @@
         {
           "name": "pages/lock/lock",
           "pathName": "pages/lock/lock",
-          "query": "",
+          "query": "car_id=demo_car",
           "scene": null
         },
         {
@@ -39,6 +39,7 @@
         {
           "name": "pages/mytrips/mytrips",
           "pathName": "pages/mytrips/mytrips",
+          "query": "",
           "scene": null
         }
       ]

@@ -76,6 +76,7 @@ func (s *Service) CreateTrip(c context.Context, req *rentalpb.CreateTripRequest)
 		Start:      ls,
 		Current:    ls,
 	})
+	s.Logger.Info("trip info", zap.String("trip_id", tr.ID.Hex()), zap.String("identiry_id", tr.Trip.IdentityId))
 	if err != nil {
 		s.Logger.Warn("Cannot create trip", zap.Error(err))
 		return nil, status.Error(codes.AlreadyExists, "")
