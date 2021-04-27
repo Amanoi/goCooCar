@@ -97,12 +97,39 @@ func (s *Service) CreateTrip(c context.Context, req *rentalpb.CreateTripRequest)
 
 // GetTrip  get the trip data.
 func (s *Service) GetTrip(c context.Context, req *rentalpb.GetTripRequest) (*rentalpb.Trip, error) {
-	return nil, status.Error(codes.Unimplemented, "")
+	aid, err := auth.AccountIDFromContext(c)
+	if err != nil {
+		return nil, err
+	}
+
+	tr, err := s.Mongo.GetTrip(c, id.TripID(req.Id), aid)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "")
+	}
+	return tr.Trip, nil
 }
 
 // GetTrips  get the trips data.
 func (s *Service) GetTrips(c context.Context, req *rentalpb.GetTripsRequest) (*rentalpb.GetTripsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "")
+	aid, err := auth.AccountIDFromContext(c)
+	if err != nil {
+		return nil, err
+	}
+
+	trips, err := s.Mongo.GetTrips(c, aid, req.Status)
+	if err != nil {
+		s.Logger.Error("cannot get trips", zap.Error(err))
+		return nil, status.Error(codes.Internal, "")
+	}
+
+	res := &rentalpb.GetTripsResponse{}
+	for _, tr := range trips {
+		res.Trips = append(res.Trips, &rentalpb.TripEntity{
+			Id:   tr.ID.Hex(),
+			Trip: tr.Trip,
+		})
+	}
+	return res, nil
 }
 
 // UpdateTrip  udate the trip data.
