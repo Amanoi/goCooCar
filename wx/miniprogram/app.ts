@@ -40,7 +40,7 @@ App<IAppOption>({
     }
 
   },
-  resoveUserInfo(userInfo: WechatMiniprogram.UserInfo) {
+  resolveUserInfo(userInfo: WechatMiniprogram.UserInfo) {
     resolveUserInfo(userInfo)
   },
 })

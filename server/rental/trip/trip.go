@@ -101,9 +101,11 @@ func (s *Service) GetTrip(c context.Context, req *rentalpb.GetTripRequest) (*ren
 	if err != nil {
 		return nil, err
 	}
+	s.Logger.Info("Cannot Found the trip of ", zap.String("tripID:", id.TripID(req.Id).String()), zap.Error(err))
 
 	tr, err := s.Mongo.GetTrip(c, id.TripID(req.Id), aid)
 	if err != nil {
+		s.Logger.Info("Cannot Found the trip of ", zap.String("tripID:", id.TripID(req.Id).String()), zap.Error(err))
 		return nil, status.Error(codes.NotFound, "")
 	}
 	return tr.Trip, nil

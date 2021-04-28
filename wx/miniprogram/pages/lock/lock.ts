@@ -23,7 +23,7 @@ Page({
         // console.log(e.detail.value.userInfo)
         const userInfo: WechatMiniprogram.UserInfo = e.detail.userInfo
         if (userInfo) {
-            getApp<IAppOption>().resoveUserInfo(userInfo)
+            getApp<IAppOption>().resolveUserInfo(userInfo)
         }
     },
     onShareLocation(e: any) {

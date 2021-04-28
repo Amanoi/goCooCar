@@ -1,3 +1,4 @@
+import { TripService } from "../../service/trip"
 import { routing } from "../../utils/routing"
 
 const cenPerSec = 0.7
@@ -45,6 +46,7 @@ Page({
     onLoad(opt:Record<'trip_id',string>) {
         const o:routing.DrivingOpts = opt
         console.log('current trip_id',o.trip_id)
+        TripService.GetTrip(o.trip_id).then(console.log)
         this.setupLocationUpdator()
         this.setUpTimer()
     },
