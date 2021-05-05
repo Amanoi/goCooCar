@@ -63,6 +63,8 @@ import (
 // 	}
 // }
 
+const DBNAME = "coolcar"
+
 func main() {
 	logger, err := server.NewZaplogger()
 	if err != nil {
@@ -91,6 +93,13 @@ func main() {
 	if err != nil {
 		logger.Fatal("cannot parse private key", zap.Error(err))
 	}
+
+	db := mongoClient.Database(DBNAME)
+	m, err := dao.NewMongo(c, db)
+	if err != nil {
+		logger.Fatal("cannot created the Mongo instance:", zap.Error(err))
+	}
+
 	logger.Sugar().Fatal(server.RunGRPCServer(
 		&server.GRPCConfig{
 			Name:   "auth",
@@ -102,7 +111,7 @@ func main() {
 						AppID:     "wx0f0f861580b7e1d1",
 						AppSecret: "0cc481da864bfeab26182d0bf82b12c5",
 					},
-					Mongo:          dao.NewMongo(mongoClient.Database("coolcar")),
+					Mongo:          m,
 					Logger:         logger,
 					TokenExpire:    5 * time.Second, //.Hour,
 					TokenGenerator: token.NewJWTTokenGen("coolcar/auth", privKey),

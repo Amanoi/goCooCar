@@ -1,12 +1,14 @@
 package mgutil
 
 import (
+	"context"
 	"coolcar/shared/mongo/objid"
 	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Common Field names.
@@ -23,6 +25,30 @@ type IDField struct {
 // UpdatedAtField defines the updatedat field.
 type UpdatedAtField struct {
 	UpdatedAt int64 `bson:"updatedat"`
+}
+
+// NewMongo param struct.
+type NewMongo struct {
+	C    context.Context
+	DB   *mongo.Database
+	Name string
+}
+
+//IsfirstCreate is
+func (nm *NewMongo) IsfirstCreate() (bool, error) {
+	flag := false
+
+	colSlice, err := nm.DB.ListCollectionNames(nm.C, bson.M{}, nil)
+	if err != nil {
+		return flag, err
+	}
+	for _, name := range colSlice {
+		if name == nm.Name {
+			flag = true
+			break
+		}
+	}
+	return flag, nil
 }
 
 // NewObjID generates a new object id.

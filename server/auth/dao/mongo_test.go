@@ -13,13 +13,41 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+const DbName = "coolcar"
+
+func TestNewMongo(t *testing.T) {
+	c := context.Background()
+	mc, err := mongotesting.NewClient(c)
+	if err != nil {
+		t.Fatalf("cannot connect mongodb:%v", err)
+	}
+	db := mc.Database(DbName)
+	m, err := NewMongo(c, db)
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
+	wantIndexStrings := []string{`{"_id": {"$numberInt":"1"}}`, `{"open_id": {"$numberInt":"1"}}`}
+	indexSlice, err := m.col.Indexes().ListSpecifications(c)
+	if indexSlice == nil {
+		t.Fatalf("not found indexs in the created mongo collection")
+	}
+	for key, index := range indexSlice {
+		if wantIndexStrings[key] != index.KeysDocument.String() {
+			t.Fatalf("cannot create right index with mongo want index:%v,got:%v", wantIndexStrings[key], index.KeysDocument.String())
+		}
+	}
+}
+
 func TestResolveAccountID(t *testing.T) {
 	c := context.Background()
 	mc, err := mongotesting.NewClient(c)
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
-	m := NewMongo(mc.Database("coolcar"))
+	m, err := NewMongo(c, mc.Database(DbName))
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
 	_, err = m.col.InsertMany(c, []interface{}{
 		bson.M{
 			mgutil.IDFieldName: objid.MustFromID(id.AccountID("605d838cbcfcb14576815cbc")),

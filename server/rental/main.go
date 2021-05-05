@@ -17,6 +17,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+//DBNAME set the database name.
+const DBNAME = "coolcar"
+
 func main() {
 	logger, err := server.NewZaplogger()
 	if err != nil {
@@ -26,6 +29,12 @@ func main() {
 	mongoClient, err := mongo.Connect(c, options.Client().ApplyURI("mongodb://localhost:55000/?readPreference=primary&ssl=false"))
 	if err != nil {
 		logger.Fatal("cannot connect mongodb!", zap.Error(err))
+	}
+
+	db := mongoClient.Database(DBNAME)
+	m, err := dao.NewMongo(c, db)
+	if err != nil {
+		logger.Fatal("cannot created the Mongo instance:", zap.Error(err))
 	}
 
 	logger.Sugar().Fatal(
@@ -39,7 +48,7 @@ func main() {
 					CarManager:     &car.Manager{},
 					PoiManager:     &poi.Manager{},
 					ProfileManager: &profile.Manager{},
-					Mongo:          dao.NewMongo(mongoClient.Database("coolcar")),
+					Mongo:          m,
 					Logger:         logger,
 				})
 			},

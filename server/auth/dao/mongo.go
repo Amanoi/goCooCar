@@ -25,10 +25,23 @@ type Mongo struct {
 // TODO : 表格驱动测试
 
 // NewMongo creates a new mongo dao.
-func NewMongo(db *mongo.Database) *Mongo {
-	return &Mongo{
-		col: db.Collection("account"),
+func NewMongo(c context.Context,db *mongo.Database) (*Mongo,error) {
+	nm := mgutil.NewMongo{
+		C:    c,
+		DB:   db,
+		Name: "account",
 	}
+	flag, err := nm.IsfirstCreate()
+	if err != nil {
+		return nil, err
+	}
+	mg := &Mongo{
+		col: db.Collection(nm.Name),
+	}
+	if !flag {
+		err = mg.createIndexs(c, db)
+	}
+	return mg, err
 }
 
 // ResolveAccountID reslove an account id from open id.
@@ -52,4 +65,14 @@ func (m *Mongo) ResolveAccountID(c context.Context, openID string) (id.AccountID
 		return "", fmt.Errorf("cannot decode result:%v", err)
 	}
 	return objid.ToAccountID(row.ID), nil
+}
+
+func (m *Mongo) createIndexs(c context.Context, d *mongo.Database) error {
+	_, err := d.Collection("account").Indexes().CreateOne(c, mongo.IndexModel{
+		Keys: bson.D{ // D 是有序键值对
+			{Key: "open_id", Value: 1},
+		},
+		Options: options.Index().SetUnique(true),
+	})
+	return err
 }

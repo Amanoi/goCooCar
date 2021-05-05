@@ -28,13 +28,19 @@ func TestCreateTrip(t *testing.T) {
 		t.Fatalf("cannot create logger: %v", err)
 	}
 
+	db := mc.Database("coolcar")
+	m, err := dao.NewMongo(c, db)
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
+
 	pm := &profileManager{}
 	cm := &carMangager{}
 	s := &Service{
 		ProfileManager: pm,
 		CarManager:     cm,
 		PoiManager:     &poi.Manager{},
-		Mongo:          dao.NewMongo(mc.Database("coolcar")),
+		Mongo:          m,
 		Logger:         logger,
 	}
 

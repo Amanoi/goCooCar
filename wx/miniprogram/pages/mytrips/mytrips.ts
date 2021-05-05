@@ -49,7 +49,7 @@ const licStatusMap = new Map([
    // [rental.v1.IdentityStatus.PENDING, '未认证'],
     //[rental.v1.IdentityStatus.VERIFIED, '已认证'],
 ])
-
+console.log(licStatusMap)
 Page({
     scrollStates: {
         mainItems: [] as MainItemQueryResult[],
@@ -90,7 +90,9 @@ Page({
     async onLoad() {
         const res = await TripService.GetTrips(rental.v1.TripStatus.FNISHED)
 
+        console.log(res)
         const layoutReady = new Promise((resolve) => {
+            console.log(resolve)
            // this.layoutResolver = resolve
         })
         Promise.all([TripService.GetTrips(), layoutReady]).then(([trips]) => {

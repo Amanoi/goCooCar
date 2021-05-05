@@ -19,18 +19,41 @@ import (
 
 const DbName = "coolcar"
 
-func TestCreateTrip(t *testing.T) {
+func TestNewMongo(t *testing.T) {
 	c := context.Background()
 	mc, err := mongotesting.NewClient(c)
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
 	db := mc.Database(DbName)
-	err = mongotesting.SetupIndexes(c, db)
+	m, err := NewMongo(c, db)
 	if err != nil {
-		t.Fatalf("cannot setup indexes: %v", err)
+		t.Fatalf("cannot created the Mongo instance: %v", err)
 	}
-	m := NewMongo(db)
+	wantIndexStrings := []string{`{"_id": {"$numberInt":"1"}}`, `{"trip.accountid": {"$numberInt":"1"},"trip.status": {"$numberInt":"1"}}`}
+	indexSlice, err := m.col.Indexes().ListSpecifications(c)
+	if indexSlice == nil {
+		t.Fatalf("not found indexs in the created mongo collection")
+	}
+	for key, index := range indexSlice {
+		if wantIndexStrings[key] != index.KeysDocument.String() {
+			t.Fatalf("cannot create right index with mongo want index:%v,got:%v", wantIndexStrings[key], index.KeysDocument.String())
+		}
+	}
+}
+
+func TestCreateTrip(t *testing.T) {
+	c := context.Background()
+	mc, err := mongotesting.NewClient(c)
+	if err != nil {
+		t.Fatalf("cannot connect mongodb:%v", err)
+	}
+
+	db := mc.Database(DbName)
+	m, err := NewMongo(c, db)
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
 
 	cases := []struct {
 		name       string
@@ -100,7 +123,13 @@ func TestGetTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
-	m := NewMongo(mc.Database(DbName))
+
+	db := mc.Database(DbName)
+	m, err := NewMongo(c, db)
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
+
 	acct := id.AccountID("account2")
 	mgutil.NewObjID = primitive.NewObjectID
 	tr, err := m.CreateTrip(c, &rentalpb.Trip{
@@ -173,7 +202,13 @@ func TestGetTrips(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot connect mongodb: %v", err)
 	}
-	m := NewMongo(mc.Database(DbName))
+
+	db := mc.Database(DbName)
+	m, err := NewMongo(c, db)
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
+
 	for _, r := range rows {
 		mgutil.NewObjectIDWithValue(id.TripID(r.id))
 		_, err := m.CreateTrip(c, &rentalpb.Trip{
@@ -232,7 +267,13 @@ func TestUpateTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
-	m := NewMongo(mc.Database(DbName))
+
+	db := mc.Database(DbName)
+	m, err := NewMongo(c, db)
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
+
 	tid := id.TripID("617fcb673ec1f0074e5efd81")
 	aid := id.AccountID("account_for_update")
 
