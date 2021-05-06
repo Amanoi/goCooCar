@@ -12,6 +12,7 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.4.3
+	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/medivhzhan/weapp/v2 v2.4.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect

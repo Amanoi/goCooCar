@@ -45,7 +45,7 @@ function genProto {
     mkdir -p $PBTS_OUT_DIR
     
     echo $DOINGCOLOR"-> 生成${DOMAIN}_pb.js"$END
-    $PBTS_BIN_DIR/pbjs -t static -w es6 $PROTO_PATH/${DOMAIN}.proto --nocreate --no-encode --no-dencode --no-verify --no-delimited -o $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js
+    $PBTS_BIN_DIR/pbjs -t static -w es6 $PROTO_PATH/${DOMAIN}.proto --nocreate --no-encode --no-dencode --no-verify --no-delimited --force-number -o $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js
     echo 'import * as $protobuf from "protobufjs";\n' > $PBTS_OUT_DIR/${DOMAIN}_pb.js
     cat $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js >> $PBTS_OUT_DIR/${DOMAIN}_pb.js
     rm $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js

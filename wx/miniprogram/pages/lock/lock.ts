@@ -4,6 +4,7 @@ import { routing } from "../../utils/routing"
 
 const shareLocationkey = "share_location"
 Page({
+    carID: '',
     data: {
         avatarURL: '',
         shareLocation: false,
@@ -11,6 +12,7 @@ Page({
     async onLoad(opt:Record<'car_id',string>) {
         const o:routing.LocksOpts = opt
         console.log('unlocking cat',o.car_id)
+        this.carID = o.car_id
         const userInfo = await getApp<IAppOption>().globalData.userInfo
         this.setData({
             avatarURL: userInfo.avatarUrl,
@@ -21,7 +23,7 @@ Page({
         // console.log(e.detail.value.userInfo)
         const userInfo: WechatMiniprogram.UserInfo = e.detail.userInfo
         if (userInfo) {
-            getApp<IAppOption>().resoveUserInfo(userInfo)
+            getApp<IAppOption>().resolveUserInfo(userInfo)
         }
     },
     onShareLocation(e: any) {
@@ -34,18 +36,24 @@ Page({
     onUnLockTap() {
         wx.getLocation({
             type: 'gcj02',
-            success: loc => {
+            success:async loc => {
                 console.log(loc, 'starting a trip', {
                     location: {},
                     //TODO:双向数据绑定
                     avatarURL: this.data.shareLocation ? this.data.avatarURL : '',
                 })
-                TripService.CreateTrip({
-                    start:'abc'
+                if (!this.carID){
+                    console.error('no carID specified')
+                    return
+                }
+               const trip = await TripService.CreateTrip({
+                    start:loc,
+                    carId:this.carID
                 })
-               
-                const tripID = 'trip456'
-
+                if (!trip.id){
+                    console.error('no tripID in response',trip)
+                    return
+                }
                 wx.showLoading({
                     title: '解锁中',
                     mask: true,
@@ -53,7 +61,7 @@ Page({
                 setTimeout(() => {
                     wx.redirectTo({
                         url:routing.driving({
-                            trip_id:tripID,
+                            trip_id:trip.id,
                         }),
                         complete: () => {
                             wx.hideLoading()

@@ -83,6 +83,9 @@ export namespace rental {
 
             /** LocationStatus poiName */
             poiName?: (string|null);
+
+            /** LocationStatus timestampSec */
+            timestampSec?: (number|null);
         }
 
         /** Represents a LocationStatus. */
@@ -105,6 +108,9 @@ export namespace rental {
 
             /** LocationStatus poiName. */
             public poiName: string;
+
+            /** LocationStatus timestampSec. */
+            public timestampSec: number;
 
             /**
              * Creates a new LocationStatus instance using the specified properties.
@@ -236,6 +242,9 @@ export namespace rental {
 
             /** Trip status */
             status?: (rental.v1.TripStatus|null);
+
+            /** Trip identityId */
+            identityId?: (string|null);
         }
 
         /** Represents a Trip. */
@@ -264,6 +273,9 @@ export namespace rental {
 
             /** Trip status. */
             public status: rental.v1.TripStatus;
+
+            /** Trip identityId. */
+            public identityId: string;
 
             /**
              * Creates a new Trip instance using the specified properties.

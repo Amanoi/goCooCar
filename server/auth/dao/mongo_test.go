@@ -5,40 +5,64 @@ import (
 	"os"
 	"testing"
 
-	mgo "coolcar/shared/mongo"
+	"coolcar/shared/id"
+	mgutil "coolcar/shared/mongo"
+	"coolcar/shared/mongo/objid"
 	mongotesting "coolcar/shared/mongo/testing"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var mongoURI string
+const DbName = "coolcar"
 
-func TestResolveAccountID(t *testing.T) {
+func TestNewMongo(t *testing.T) {
 	c := context.Background()
-	mc, err := mongo.Connect(c, options.Client().ApplyURI(mongoURI))
+	mc, err := mongotesting.NewClient(c)
 	if err != nil {
 		t.Fatalf("cannot connect mongodb:%v", err)
 	}
-	m := NewMongo(mc.Database("coolcar"))
+	db := mc.Database(DbName)
+	m, err := NewMongo(c, db)
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
+	wantIndexStrings := []string{`{"_id": {"$numberInt":"1"}}`, `{"open_id": {"$numberInt":"1"}}`}
+	indexSlice, err := m.col.Indexes().ListSpecifications(c)
+	if indexSlice == nil {
+		t.Fatalf("not found indexs in the created mongo collection")
+	}
+	for key, index := range indexSlice {
+		if wantIndexStrings[key] != index.KeysDocument.String() {
+			t.Fatalf("cannot create right index with mongo want index:%v,got:%v", wantIndexStrings[key], index.KeysDocument.String())
+		}
+	}
+}
+
+func TestResolveAccountID(t *testing.T) {
+	c := context.Background()
+	mc, err := mongotesting.NewClient(c)
+	if err != nil {
+		t.Fatalf("cannot connect mongodb:%v", err)
+	}
+	m, err := NewMongo(c, mc.Database(DbName))
+	if err != nil {
+		t.Fatalf("cannot created the Mongo instance: %v", err)
+	}
 	_, err = m.col.InsertMany(c, []interface{}{
 		bson.M{
-			mgo.IDField: mustObjID("605d838cbcfcb14576815cbc"),
-			opedIDField: "openid_1",
+			mgutil.IDFieldName: objid.MustFromID(id.AccountID("605d838cbcfcb14576815cbc")),
+			opedIDField:        "openid_1",
 		},
 		bson.M{
-			mgo.IDField: mustObjID("605d838cbcfcb14576915cbe"),
-			opedIDField: "openid_2",
+			mgutil.IDFieldName: objid.MustFromID(id.AccountID("605d838cbcfcb14576915cbe")),
+			opedIDField:        "openid_2",
 		},
 	})
 	if err != nil {
 		t.Fatalf("cannot insert inital values: %v", err)
 	}
-	m.newObjID = func() primitive.ObjectID {
-		return mustObjID("605d838cbcfcb14576c15cb4")
-	}
+
+	mgutil.NewObjectIDWithValue(id.AccountID("605d838cbcfcb14576c15cb4"))
 
 	cases := []struct {
 		name   string
@@ -67,7 +91,7 @@ func TestResolveAccountID(t *testing.T) {
 			if err != nil {
 				t.Errorf("fail resolve account id for %q:%v\n", cc.openID, err)
 			}
-			if id != cc.want {
+			if id.String() != cc.want {
 				t.Errorf("resolve account id want: %q,got:%q", cc.want, id)
 			}
 		})
@@ -82,14 +106,6 @@ func TestResolveAccountID(t *testing.T) {
 	// 	}
 	// }
 }
-func mustObjID(hex string) primitive.ObjectID {
-	objID, err := primitive.ObjectIDFromHex(hex)
-	if err != nil {
-		panic(err)
-	}
-	return objID
-}
-
 func TestMain(m *testing.M) {
-	os.Exit(mongotesting.RunWithMongoInDocker(m, &mongoURI))
+	os.Exit(mongotesting.RunWithMongoInDocker(m))
 }
