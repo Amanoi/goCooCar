@@ -164,8 +164,11 @@ func (s *Service) UpdateTrip(c context.Context, req *rentalpb.UpdateTripRequest)
 		tr.Trip.End = tr.Trip.Current
 		tr.Trip.Status = rentalpb.TripStatus_FNISHED
 	}
-	s.Mongo.UpdateTrip(c, tid, aid, tr.UpdatedAt, tr.Trip)
-	return nil, status.Error(codes.Unimplemented, "")
+	err = s.Mongo.UpdateTrip(c, tid, aid, tr.UpdatedAt, tr.Trip)
+	if err != nil {
+		return nil, status.Error(codes.Aborted, "")
+	}
+	return tr.Trip, nil
 }
 
 var nowFunc = func() int64 {
